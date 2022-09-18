@@ -21,8 +21,14 @@ module Sequel
               next unless self.model.association_reflections[key.to_sym][:polymorphic]
 
               cond.first.delete(key)
-              cond.first["#{key}_id".to_sym] = value.pk
-              cond.first["#{key}_type".to_sym] = value.class.to_s
+              if value.is_a?(String)
+                val_arr = value.split(/_(\d+)$/)
+                cond.first["#{key}_id".to_sym] = val_arr[1]
+                cond.first["#{key}_type".to_sym] = val_arr[0]
+              else
+                cond.first["#{key}_id".to_sym] = value.pk
+                cond.first["#{key}_type".to_sym] = value.class.to_s
+              end
             end
           end
 
